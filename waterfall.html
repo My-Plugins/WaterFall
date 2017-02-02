@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>jQuery Plugin</title>
+ <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="items">
+      <!-- TODO 需要渲染数据的地方 -->
+    </div>
+    <div class="btn">加载更多...</div>
+</div>
+<script type="text/template" id="tpl">
+  {{each items as value i}}
+      <div class="item">
+        <img src="{{value.path}}" alt="{{i}}">
+        <p>{{value.text}}</p>
+      </div>
+  {{/each}}
+</script>
+<script src="js/jquery.min.js"></script>
+<script src="js/template.js"></script>
+<script src="js/my-jquery.waterfall.js"></script>
+<script>
+  /*
+     1.请求方式  get
+     2.请求url  data.php
+     3.请求传递的参数   page  当前页数  pageSize  每一页多少条数据
+     4.是后台在处理
+     5.返回数据 {page:'下一页的页码',items:[{path:'图片路径',text:'文字'},{},{}...]}
+*/
+ /*
+     * 1.首屏加载一次数据  渲染第一页的数据
+     * 2.变成瀑布流的布局方式
+     * 3.当我们点击加载更多的时候  去请求接口获取数据  把数据渲染成html （下一页）
+     * 4.防止重复提交
+     * 5.没有数据的时候  可以提示  没有数据可以加载   不能发请求
+     * */
+    $(function(){
+      // 获取瀑布流容器
+      var $container = $('.items');
+      var $btn = $('.btn');
+      var renderHtml = function(){
+        $.ajax({
+            type:'get',
+            url:'data.php',
+            data:{
+              page:$btn.data('page') || 1,//去页面，如果没有默认的是第一页
+              pageSize:10//每一页的条数
+            },
+            dataType:'json',
+            beforeSend:function(){
+              $btn.addClass('loading').html('正在加载中.....');
+            },
+            success:function(data){
+              //处理数据
+              //设置下一页的页码
+              $btn.data('page',data.page);
+              //渲染页面
+              // 1.写模板
+              // 2.转化成html结构
+              var html = template('tpl',data);
+              // 3.页面渲染
+              $container.append(html);
+              // 4.瀑布流布局
+              $container.waterFall();
+
+              if(data && data.items && data.items.length){
+                $btn.removeClass('loading').html('加载更多');
+              }else{
+                $btn.addClass('loading').html('没有更多数据了');
+              }
+
+            }
+        })
+      }
+      /** 3.当我们点击加载更多的时候  去请求接口获取数据  把数据渲染成html （下一页）
+         * 4.防止重复提交*/
+      $btn.on('click',function(){
+          if($btn.hasClass('loading')){
+            return false;
+          }
+          renderHtml();
+      })
+    })
+     // 添加滚动事件加载瀑布流
+     $(window).on('scroll', function () {
+          //得到父容器的定位
+            var offsetTop = $('.items').offset().top;
+            //父容器的高度
+            var height = $('.items').height();
+            // 得到卷曲的高度
+            var scrollTop = $(this).scrollTop();
+            var winHeight = $(this).height();
+            var offset = offsetTop + height - scrollTop - winHeight;
+            if (offset <= 200 && !$('.btn').hasClass('loading')) {
+                renderHtml();
+            }
+        });
+</script>
+</body>
+</html>

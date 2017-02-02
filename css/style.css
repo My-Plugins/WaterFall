@@ -1,0 +1,51 @@
+body{
+  margin: 0;
+  padding: 0;
+  font-family:"Microsoft Yahei";
+  background-color: #f5f5f5;
+}
+.container{
+  width: 1200px;
+  margin: 0 auto;
+  padding-top: 40px;
+}
+
+.container > .items{
+  position: relative;
+}
+.container > .items > .item{
+  width:232px;
+  position:absolute;
+  box-shadow: 0 1px 3px rgba(0, 0 ,0, 0.3);
+}
+.container > .items > .item >img{
+  width: 100%;
+  display:block;
+  height: 250px;
+  /* 目的是固定高度且不一样 */
+}
+.container > .items > .item:nth-child(4n) >img{
+  width: 100%;
+  display:block;
+  height:450px;
+  /*  目的是固定高度且不一样 */
+}
+.container > .items > .item > p{
+  margin:0;
+  padding: 10px;
+  background: #fff;
+}
+.container > .btn {
+  width: 280px;
+  height: 40px;
+  margin:30px auto;
+  text-align: center;
+  line-height:40px;
+  background:#CCC;
+  border-radius:6px;
+  font-size:24px;
+  cursor:pointer;
+}
+.container > .loading{
+  background-color:transparent;
+}
